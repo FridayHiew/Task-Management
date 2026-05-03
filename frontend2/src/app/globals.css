@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6;
+  }
+}
+
+@layer utilities {
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .animate-in {
+    animation: slideIn 0.3s ease-out;
+  }
+}
+
+/* Custom Flatpickr styles */
+.flatpickr-calendar {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  font-family: inherit;
+}
+
+.flatpickr-day.selected {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.flatpickr-day.selected:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.flatpickr-day.today {
+  border-color: #3b82f6;
+}
+
+.flatpickr-day.today:hover {
+  background: #3b82f6;
+  color: white;
+}
