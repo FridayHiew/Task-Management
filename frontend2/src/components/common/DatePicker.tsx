@@ -17,10 +17,11 @@ export default function DatePicker({ value, onChange, placeholder, className }: 
 
   useEffect(() => {
     if (inputRef.current) {
-      // @ts-ignore - Flatpickr type issue
+      // @ts-expect-error - Flatpickr constructor type issue
       flatpickrInstance.current = new Flatpickr(inputRef.current, {
-        dateFormat: 'd M Y',
-        defaultDate: value || undefined,
+        dateFormat: 'Y-m-d',
+        // 关键修复：只有当 value 有值时才设置 defaultDate
+        defaultDate: value && value !== '' ? value : null,
         onChange: (selectedDates: Date[]) => {
           if (selectedDates.length > 0) {
             const date = selectedDates[0];
@@ -44,9 +45,18 @@ export default function DatePicker({ value, onChange, placeholder, className }: 
     };
   }, []);
 
+  // 监听 value 变化，更新 Flatpickr 的显示
   useEffect(() => {
-    if (flatpickrInstance.current && value !== flatpickrInstance.current.input.value) {
-      flatpickrInstance.current.setDate(value, false);
+    if (flatpickrInstance.current) {
+      if (value && value !== '') {
+        flatpickrInstance.current.setDate(value, false);
+      } else {
+        // 如果 value 为空，清空显示
+        flatpickrInstance.current.clear();
+        if (inputRef.current) {
+          inputRef.current.value = '';
+        }
+      }
     }
   }, [value]);
 
@@ -55,7 +65,7 @@ export default function DatePicker({ value, onChange, placeholder, className }: 
       ref={inputRef}
       type="text"
       placeholder={placeholder || 'Select date'}
-      className={className || "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"}
+      className={className || "w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"}
       readOnly
     />
   );

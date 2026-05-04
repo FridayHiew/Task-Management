@@ -77,10 +77,6 @@ export default function SettingsNavigation({ onNavigate }: SettingsNavigationPro
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <div className="bg-white shadow-sm border-b px-4 py-3">
-        <h1 className="text-xl font-semibold">Settings</h1>
-      </div>
-
       <div className="p-4 space-y-6">
         {/* User Header Section - Icon on left, username/email on right */}
         <div className="space-y-2">

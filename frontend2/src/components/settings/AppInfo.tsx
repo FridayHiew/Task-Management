@@ -97,8 +97,11 @@ export default function AppInfo({ onBack }: AppInfoProps) {
           </div>
 
           {/* Footer Note */}
-          <div className="text-center pt-4">
-            <p className="text-xs text-gray-400">© 2024 TaskMaster. All rights reserved.</p>
+          <div className="text-center mt-6">
+            <p className="text-xs text-gray-400">
+              © 2026 Provato Helios Technologies.
+            </p>
+            <p>All rights reserved.</p>
           </div>
         </div>
       </div>

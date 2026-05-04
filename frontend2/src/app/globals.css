@@ -51,3 +51,25 @@
   background: #3b82f6;
   color: white;
 }
+
+/* 防止表格溢出 */
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 小屏幕优化 */
+@media (max-width: 480px) {
+  .card-container {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  
+  /* 防止文字溢出 */
+  .truncate-text {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

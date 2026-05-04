@@ -79,6 +79,7 @@ export default function SettingsPage() {
           <span className="text-xs">Settings</span>
         </button>
       </div>
-    </div>
+    </div>    
   );
+
 }

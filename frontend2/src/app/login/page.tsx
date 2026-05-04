@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';  // ← Added useEffect
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
@@ -15,33 +15,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
 
-  // Load remembered username on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedUsername = localStorage.getItem('rememberedUsername');
-      if (savedUsername) {
-        setUsername(savedUsername);
-        setRememberMe(true);
-      }
-    }
-  }, []);
-
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
       await login(username, password);
-      
-      if (rememberMe) {
-        localStorage.setItem('rememberedUsername', username);
-      } else {
-        localStorage.removeItem('rememberedUsername');
-      }
-      
       showToast('Login successful! Welcome back!', 'success');
       router.push('/home');
     } catch (err: any) {
@@ -133,26 +113,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-blue-500 rounded border-gray-300 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-600">Remember me</span>
-              </label>
-              <button
-                type="button"
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                onClick={() => showToast('Contact admin to reset password', 'info')}
-              >
-                Forgot password?
-              </button>
-            </div>
-
             {/* Submit Button */}
             <button
               type="submit"
@@ -171,14 +131,29 @@ export default function LoginPage() {
                 'Sign in'
               )}
             </button>
+
+
+            
+            {/* Forgot Password only - Remember me removed */}
+            <div className="flex items-center justify-center">
+              <button
+                type="button"
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                onClick={() => showToast('Contact admin to reset password', 'info')}
+              >
+                Forgot password?
+              </button>
+            </div>
+
           </form>
         </div>
 
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-xs text-gray-400">
-            © 2024 TaskMaster. All rights reserved.
+            © 2026 Provato Helios Technologies.
           </p>
+          <p>All rights reserved.</p>
         </div>
       </div>
     </div>

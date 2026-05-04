@@ -253,6 +253,9 @@ exports.getTaskById = async (taskId, userId) => {
 // =========================
 // UPDATE TASK
 // =========================
+// =========================
+// UPDATE TASK (FULL - 包含 solutions, costs, risks)
+// =========================
 exports.updateTaskFull = async (taskId, userId, data) => {
   const client = await db.getConnection();
 
@@ -270,6 +273,9 @@ exports.updateTaskFull = async (taskId, userId, data) => {
       return null;
     }
 
+    // =========================
+    // 1. UPDATE MAIN TASK FIELDS
+    // =========================
     const updateFields = [];
     const updateParams = [];
     let paramCount = 1;
@@ -331,21 +337,86 @@ exports.updateTaskFull = async (taskId, userId, data) => {
       paramCount++;
     }
 
-    updateFields.push(`updated_at = NOW()`);
+    if (updateFields.length > 0) {
+      updateFields.push(`updated_at = NOW()`);
+      updateParams.push(taskId, userId);
 
-    updateParams.push(taskId, userId);
+      await client.query(
+        `UPDATE tasks SET ${updateFields.join(", ")} WHERE id = $${paramCount} AND user_id = $${paramCount + 1}`,
+        updateParams
+      );
+    }
 
-    await client.query(
-      `UPDATE tasks SET ${updateFields.join(", ")} WHERE id = $${paramCount} AND user_id = $${paramCount + 1}`,
-      updateParams
-    );
+    // =========================
+    // 2. UPDATE SOLUTIONS (如果前端传了 solutions 数据)
+    // =========================
+    if (data.solutions && Array.isArray(data.solutions)) {
+      
+      // 删除该任务的所有现有 solutions（cascade 会自动删除 costs 和 risks）
+      await client.query(
+        `DELETE FROM task_solutions WHERE task_id = $1`,
+        [taskId]
+      );
+      
+      // 插入新的 solutions
+      for (const sol of data.solutions) {
+        // 插入 solution
+        const solutionResult = await client.query(
+          `
+          INSERT INTO task_solutions (task_id, solution, created_at)
+          VALUES ($1, $2, NOW())
+          RETURNING id
+          `,
+          [taskId, sol.solution]
+        );
+
+        const solutionId = solutionResult.rows[0].id;
+
+        // 插入 costs
+        if (sol.costs && Array.isArray(sol.costs) && sol.costs.length > 0) {
+          for (const c of sol.costs) {
+            await client.query(
+              `
+              INSERT INTO task_costs (solution_id, cost, manpower, maintenance_cost)
+              VALUES ($1, $2, $3, $4)
+              `,
+              [
+                solutionId,
+                c.cost ?? 0,
+                c.manpower ?? "",
+                c.maintenance_cost ?? 0
+              ]
+            );
+          }
+        }
+
+        // 插入 risks
+        if (sol.risks && Array.isArray(sol.risks) && sol.risks.length > 0) {
+          for (const r of sol.risks) {
+            await client.query(
+              `
+              INSERT INTO task_risks (solution_id, risk, mitigation)
+              VALUES ($1, $2, $3)
+              `,
+              [
+                solutionId,
+                r.risk,
+                r.mitigation ?? null
+              ]
+            );
+          }
+        }
+      }
+    }
 
     await client.query('COMMIT');
 
+    // 返回更新后的完整任务
     return await exports.getTaskById(taskId, userId);
 
   } catch (err) {
     await client.query('ROLLBACK');
+    console.error('Update task error:', err);
     throw err;
   } finally {
     client.release();

@@ -105,6 +105,7 @@ export default function TaskTable({
   };
 
   // Mobile card view for smaller screens
+
   const MobileTaskCard = ({ task, index }: { task: Task; index: number }) => {
     const deadlinePassed = isDeadlinePassed(task.deadline);
     const deadlineStyle = getDeadlineStyle(task.deadline);
